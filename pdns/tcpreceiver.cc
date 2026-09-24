@@ -381,14 +381,24 @@ void TCPNameserver::doConnection(int fd, Logr::log_t slog)
 
       if(packet->qtype.getCode()==QType::AXFR) {
         packet->d_xfr=true;
-        g_zoneCache.setZoneVariant(*packet);
+        if (g_views) {
+          g_zoneCache.setZoneVariant(*packet);
+        }
+        else {
+          packet->qdomainzone = ZoneName(packet->qdomain);
+        }
         doAXFR(packet->qdomainzone, packet, fd, slog);
         continue;
       }
 
       if(packet->qtype.getCode()==QType::IXFR) {
         packet->d_xfr=true;
-        g_zoneCache.setZoneVariant(*packet);
+        if (g_views) {
+          g_zoneCache.setZoneVariant(*packet);
+        }
+        else {
+          packet->qdomainzone = ZoneName(packet->qdomain);
+        }
         doIXFR(packet, fd, slog);
         continue;
       }
